@@ -219,27 +219,29 @@ export default function Dashboard() {
                         </span>
                         <div className="flex gap-2">
                           {task.status === 'PENDING' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleSendApprovalClick(task)}
-                              disabled={sendingApprovalId === task._id}
-                              className="gap-2"
-                            >
-                              <Mail size={16} />
-                              <span>Send Approval</span>
-                            </Button>
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleSendApprovalClick(task)}
+                                disabled={sendingApprovalId === task._id}
+                                className="gap-2"
+                              >
+                                <Mail size={16} />
+                                <span>Send Approval</span>
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditClick(task)}
+                                disabled={updatingTaskId === task._id}
+                                className="gap-2"
+                              >
+                                <Edit2 size={16} />
+                                <span>Edit</span>
+                              </Button>
+                            </>
                           )}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditClick(task)}
-                            disabled={updatingTaskId === task._id}
-                            className="gap-2"
-                          >
-                            <Edit2 size={16} />
-                            <span>Edit</span>
-                          </Button>
                           <Button
                             variant="destructive"
                             size="sm"

@@ -37,3 +37,6 @@ out
 
 # Coverage directory
 coverage
+
+# Local Netlify folder
+.netlify

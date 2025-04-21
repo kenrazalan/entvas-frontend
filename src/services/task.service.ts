@@ -8,7 +8,7 @@ export interface Task {
   title: string;
   description: string;
   assigneeEmail: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
   createdAt: string;
   updatedAt: string;
 }
@@ -71,6 +71,18 @@ class TaskService {
     try {
       await axios.delete(
         `${API_URL}/tasks/${taskId}`,
+        this.getAuthHeader()
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async sendApprovalEmail(taskId: string): Promise<void> {
+    try {
+      await axios.post(
+        `${API_URL}/tasks/${taskId}/send-approval`,
+        {},
         this.getAuthHeader()
       );
     } catch (error) {

@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { authService } from '@/services/auth.service';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, LogOut, Trash2, Edit2 } from 'lucide-react';
+import { PlusCircle, LogOut, Trash2, Edit2, Mail } from 'lucide-react';
 import TaskForm from '@/components/TaskForm';
 import DeleteTaskModal from '@/components/DeleteTaskModal';
 import EditTaskModal from '@/components/EditTaskModal';
+import SendApprovalModal from '@/components/SendApprovalModal';
 import { Task, taskService } from '@/services/task.service';
 
 export default function Dashboard() {
@@ -19,6 +20,9 @@ export default function Dashboard() {
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+  const [taskToSendApproval, setTaskToSendApproval] = useState<Task | null>(null);
+  const [sendingApprovalId, setSendingApprovalId] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     fetchTasks();
@@ -97,6 +101,35 @@ export default function Dashboard() {
     setUpdatingTaskId(null);
   };
 
+  const handleSendApprovalClick = (task: Task) => {
+    setTaskToSendApproval(task);
+  };
+
+  const handleSendApprovalConfirm = async () => {
+    if (!taskToSendApproval) return;
+
+    try {
+      setSendingApprovalId(taskToSendApproval._id);
+      await taskService.sendApprovalEmail(taskToSendApproval._id);
+      setSuccessMessage(`Approval email sent to ${taskToSendApproval.assigneeEmail}`);
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to send approval email');
+    } finally {
+      setSendingApprovalId(null);
+      setTaskToSendApproval(null);
+    }
+  };
+
+  const handleSendApprovalCancel = () => {
+    setTaskToSendApproval(null);
+    setSendingApprovalId(null);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow-sm">
@@ -146,6 +179,12 @@ export default function Dashboard() {
             </div>
           )}
 
+          {successMessage && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+              {successMessage}
+            </div>
+          )}
+
           {loading ? (
             <div className="text-center py-8">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
@@ -170,15 +209,27 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center gap-4">
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          task.status === 'Approved' 
+                          task.status === 'APPROVED' 
                             ? 'bg-green-100 text-green-800' 
-                            : task.status === 'Rejected' 
+                            : task.status === 'REJECTED' 
                               ? 'bg-red-100 text-red-800' 
                               : 'bg-yellow-100 text-yellow-800'
                         }`}>
                           {task.status}
                         </span>
                         <div className="flex gap-2">
+                          {task.status === 'PENDING' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleSendApprovalClick(task)}
+                              disabled={sendingApprovalId === task._id}
+                              className="gap-2"
+                            >
+                              <Mail size={16} />
+                              <span>Send Approval</span>
+                            </Button>
+                          )}
                           <Button
                             variant="outline"
                             size="sm"
@@ -224,6 +275,14 @@ export default function Dashboard() {
         onConfirm={handleEditConfirm}
         task={taskToEdit}
         isUpdating={!!updatingTaskId}
+      />
+
+      <SendApprovalModal
+        isOpen={!!taskToSendApproval}
+        onClose={handleSendApprovalCancel}
+        onConfirm={handleSendApprovalConfirm}
+        task={taskToSendApproval}
+        isSending={!!sendingApprovalId}
       />
     </div>
   );

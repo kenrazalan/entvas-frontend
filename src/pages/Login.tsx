@@ -75,11 +75,6 @@ export default function Login() {
                     className="h-11"
                   />
                 </div>
-                <div className="flex justify-end">
-                  <Link to="/forgot-password" className="text-sm text-[hsl(var(--primary))] hover:underline">
-                    Forgot password?
-                  </Link>
-                </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">

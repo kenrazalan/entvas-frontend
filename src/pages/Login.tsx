@@ -5,19 +5,28 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn, Mail, Lock } from "lucide-react";
+import { authService } from '@/services/auth.service';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual login logic
-    console.log("Login attempt with:", { email, password });
-    
-    // For now, just navigate to the dashboard
-    navigate("/dashboard");
+    setError('');
+    setLoading(true);
+
+    try {
+      await authService.login({ email, password });
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to login');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,7 +42,7 @@ export default function LoginPage() {
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>Enter your credentials to access the dashboard.</CardDescription>
           </CardHeader>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleSubmit}>
             <CardContent>
               <div className="grid w-full items-center gap-4">
                 <div className="flex flex-col space-y-1.5">
@@ -74,9 +83,11 @@ export default function LoginPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full h-11 gap-2">
-                <LogIn size={18} />
-                <span>Login</span>
+              {error && (
+                <div className="text-red-500 text-sm text-center">{error}</div>
+              )}
+              <Button type="submit" className="w-full h-11 gap-2" disabled={loading}>
+                {loading ? 'Signing in...' : <span>Login</span>}
               </Button>
               <div className="text-center text-sm text-[hsl(var(--muted-foreground))]">
                 Don't have an account?{" "}

@@ -19,7 +19,7 @@ export default function Dashboard() {
               <h1 className="text-xl font-semibold">Task Management Dashboard</h1>
             </div>
             <div className="flex items-center">
-              <span className="mr-4">Welcome, {user?.email}</span>
+              <span className="mr-4">Welcome, {user?.name || 'User'}</span>
               <button
                 onClick={handleLogout}
                 className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700"

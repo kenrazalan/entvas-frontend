@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/UI/button';
 import Modal from '@/components/UI/Modal';
 import { Loader2, AlertTriangle } from 'lucide-react';
 

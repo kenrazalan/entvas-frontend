@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { authService } from '@/services/auth.service';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/UI/button';
 import { PlusCircle, LogOut, Trash2, Edit2, Mail } from 'lucide-react';
 import TaskForm from '@/components/TaskForm';
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal';

@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/UI/button";
 import { 
   BarChart3, 
   Settings, 

@@ -36,7 +36,6 @@ export default function Dashboard() {
   };
 
   const handleTaskCreated = () => {
-    setShowTaskForm(false);
     fetchTasks();
   };
 
@@ -77,14 +76,11 @@ export default function Dashboard() {
             </Button>
           </div>
 
-          {showTaskForm && (
-            <div className="mb-6">
-              <TaskForm 
-                onSuccess={handleTaskCreated} 
-                onCancel={() => setShowTaskForm(false)} 
-              />
-            </div>
-          )}
+          <TaskForm 
+            isOpen={showTaskForm}
+            onClose={() => setShowTaskForm(false)}
+            onSuccess={handleTaskCreated}
+          />
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">

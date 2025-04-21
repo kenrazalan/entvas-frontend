@@ -6,13 +6,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { CreateTaskRequest, taskService } from '@/services/task.service';
 import { PlusCircle, Loader2 } from 'lucide-react';
+import Modal from '@/components/UI/Modal';
 
 interface TaskFormProps {
+  isOpen: boolean;
+  onClose: () => void;
   onSuccess: () => void;
-  onCancel: () => void;
 }
 
-export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
+export default function TaskForm({ isOpen, onClose, onSuccess }: TaskFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [assigneeEmail, setAssigneeEmail] = useState('');
@@ -33,6 +35,7 @@ export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
       
       await taskService.createTask(taskData);
       onSuccess();
+      onClose();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create task');
     } finally {
@@ -41,79 +44,71 @@ export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl">Create New Task</CardTitle>
-        <CardDescription>Fill in the details to create a new task.</CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                placeholder="Enter task title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-                className="h-11"
-              />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Enter task description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-                className="min-h-[100px]"
-              />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="assigneeEmail">Assignee Email</Label>
-              <Input
-                id="assigneeEmail"
-                type="email"
-                placeholder="Enter assignee email"
-                value={assigneeEmail}
-                onChange={(e) => setAssigneeEmail(e.target.value)}
-                required
-                className="h-11"
-              />
-            </div>
+    <Modal isOpen={isOpen} onClose={onClose} title="Create New Task">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid w-full items-center gap-4">
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              placeholder="Enter task title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              className="h-11"
+            />
           </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
-          )}
-          <div className="flex justify-end gap-2 w-full">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onCancel}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" className="gap-2" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Creating...</span>
-                </>
-              ) : (
-                <>
-                  <PlusCircle className="h-4 w-4" />
-                  <span>Create Task</span>
-                </>
-              )}
-            </Button>
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Enter task description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              className="min-h-[100px]"
+            />
           </div>
-        </CardFooter>
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="assigneeEmail">Assignee Email</Label>
+            <Input
+              id="assigneeEmail"
+              type="email"
+              placeholder="Enter assignee email"
+              value={assigneeEmail}
+              onChange={(e) => setAssigneeEmail(e.target.value)}
+              required
+              className="h-11"
+            />
+          </div>
+        </div>
+        {error && (
+          <div className="text-red-500 text-sm text-center">{error}</div>
+        )}
+        <div className="flex justify-end gap-2 w-full">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onClose}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" className="gap-2" disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Creating...</span>
+              </>
+            ) : (
+              <>
+                <PlusCircle className="h-4 w-4" />
+                <span>Create Task</span>
+              </>
+            )}
+          </Button>
+        </div>
       </form>
-    </Card>
+    </Modal>
   );
 } 

@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/UI/dialog";
-import { Mail } from 'lucide-react';
 import { Task } from '@/services/task.service';
 
 interface SendApprovalModalProps {

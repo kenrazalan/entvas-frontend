@@ -4,7 +4,7 @@ import { authService } from './auth.service';
 const API_URL = 'https://entvas-backend.onrender.com/api';
 
 export interface Task {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   assigneeEmail: string;

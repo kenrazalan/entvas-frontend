@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { authService } from '@/services/auth.service';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, LogOut } from 'lucide-react';
+import { PlusCircle, LogOut, Trash2 } from 'lucide-react';
 import TaskForm from '@/components/TaskForm';
+import DeleteTaskModal from '@/components/DeleteTaskModal';
 import { Task, taskService } from '@/services/task.service';
 
 export default function Dashboard() {
@@ -13,6 +14,8 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   useEffect(() => {
     fetchTasks();
@@ -37,6 +40,31 @@ export default function Dashboard() {
 
   const handleTaskCreated = () => {
     fetchTasks();
+  };
+
+  const handleDeleteClick = (task: Task) => {
+    console.log(task, 'task')
+    setTaskToDelete(task);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!taskToDelete) return;
+
+    try {
+      setDeletingTaskId(taskToDelete._id);
+      await taskService.deleteTask(taskToDelete._id);
+      setTasks(tasks.filter(task => task._id !== taskToDelete._id));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to delete task');
+    } finally {
+      setDeletingTaskId(null);
+      setTaskToDelete(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setTaskToDelete(null);
+    setDeletingTaskId(null);
   };
 
   return (
@@ -103,14 +131,14 @@ export default function Dashboard() {
             <div className="bg-white shadow overflow-hidden sm:rounded-md">
               <ul className="divide-y divide-gray-200">
                 {tasks.map((task) => (
-                  <li key={task.id} className="px-6 py-4 hover:bg-gray-50">
+                  <li key={task._id} className="px-6 py-4 hover:bg-gray-50">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-lg font-medium">{task.title}</h3>
                         <p className="mt-1 text-sm text-gray-500">{task.description}</p>
                         <p className="mt-1 text-xs text-gray-400">Assigned to: {task.assigneeEmail}</p>
                       </div>
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-4">
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                           task.status === 'Approved' 
                             ? 'bg-green-100 text-green-800' 
@@ -120,6 +148,16 @@ export default function Dashboard() {
                         }`}>
                           {task.status}
                         </span>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteClick(task)}
+                          disabled={deletingTaskId === task._id}
+                          className="gap-2"
+                        >
+                          <Trash2 size={16} />
+                          <span>Delete</span>
+                        </Button>
                       </div>
                     </div>
                   </li>
@@ -129,6 +167,14 @@ export default function Dashboard() {
           )}
         </div>
       </main>
+
+      <DeleteTaskModal
+        isOpen={!!taskToDelete}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        taskTitle={taskToDelete?.title || ''}
+        isDeleting={!!deletingTaskId}
+      />
     </div>
   );
 } 

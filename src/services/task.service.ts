@@ -89,6 +89,29 @@ class TaskService {
       throw error;
     }
   }
+
+  async getTaskByToken(token: string): Promise<Task> {
+    try {
+      const response = await axios.get(
+        `${API_URL}/tasks/view/${token}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async respondToTask(token: string, approve: boolean): Promise<Task> {
+    try {
+      const response = await axios.post(
+        `${API_URL}/tasks/respond/${token}`,
+        { approve }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export const taskService = new TaskService(); 

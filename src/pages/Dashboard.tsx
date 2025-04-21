@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react';
 import { authService } from '@/services/auth.service';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/UI/button';
-import { PlusCircle, LogOut, Trash2, Edit2, Mail } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import TaskForm from '@/components/TaskForm';
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal';
 import EditTaskModal from '@/components/modals/EditTaskModal';
 import SendApprovalModal from '@/components/modals/SendApprovalModal';
 import { Task, taskService } from '@/services/task.service';
+import Navbar from '@/components/Navbar';
+import TaskList from '@/components/TaskList';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const user = authService.getCurrentUser();
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,7 +85,6 @@ export default function Dashboard() {
       setUpdatingTaskId(taskToEdit._id);
       const updatedTask = await taskService.updateTask(taskToEdit._id, taskData);
       
-      // Update the task in the local state
       setTasks(tasks.map(task => 
         task._id === taskToEdit._id ? updatedTask : task
       ));
@@ -113,7 +113,6 @@ export default function Dashboard() {
       await taskService.sendApprovalEmail(taskToSendApproval._id);
       setSuccessMessage(`Approval email sent to ${taskToSendApproval.assigneeEmail}`);
       
-      // Clear success message after 5 seconds
       setTimeout(() => {
         setSuccessMessage('');
       }, 5000);
@@ -132,35 +131,15 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold">Task Management Dashboard</h1>
-            </div>
-            <div className="flex items-center">
-              <span className="mr-4">Welcome, {user?.name || 'User'}</span>
-              <Button
-                onClick={handleLogout}
-                variant="destructive"
-                size="sm"
-                className="gap-2"
-              >
-                <LogOut size={16} />
-                <span>Logout</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar onLogout={handleLogout} />
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Your Tasks</h2>
+      <main className="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+        <div className="py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold">Your Tasks</h2>
             <Button 
               onClick={() => setShowTaskForm(true)}
-              className="gap-2"
+              className="w-full sm:w-auto gap-2"
             >
               <PlusCircle size={18} />
               <span>Create Task</span>
@@ -192,73 +171,16 @@ export default function Dashboard() {
               </div>
               <p className="mt-2 text-gray-500">Loading tasks...</p>
             </div>
-          ) : tasks.length === 0 ? (
-            <div className="bg-white shadow rounded-lg p-6 text-center">
-              <p className="text-gray-500">No tasks found. Create your first task to get started.</p>
-            </div>
           ) : (
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
-              <ul className="divide-y divide-gray-200">
-                {tasks.map((task) => (
-                  <li key={task._id} className="px-6 py-4 hover:bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-medium">{task.title}</h3>
-                        <p className="mt-1 text-sm text-gray-500">{task.description}</p>
-                        <p className="mt-1 text-xs text-gray-400">Assigned to: {task.assigneeEmail}</p>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          task.status === 'APPROVED' 
-                            ? 'bg-green-100 text-green-800' 
-                            : task.status === 'REJECTED' 
-                              ? 'bg-red-100 text-red-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {task.status}
-                        </span>
-                        <div className="flex gap-2">
-                          {task.status === 'PENDING' && (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleSendApprovalClick(task)}
-                                disabled={sendingApprovalId === task._id}
-                                className="gap-2"
-                              >
-                                <Mail size={16} />
-                                <span>Send Approval</span>
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditClick(task)}
-                                disabled={updatingTaskId === task._id}
-                                className="gap-2"
-                              >
-                                <Edit2 size={16} />
-                                <span>Edit</span>
-                              </Button>
-                            </>
-                          )}
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteClick(task)}
-                            disabled={deletingTaskId === task._id}
-                            className="gap-2"
-                          >
-                            <Trash2 size={16} />
-                            <span>Delete</span>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <TaskList
+              tasks={tasks}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteClick}
+              onSendApproval={handleSendApprovalClick}
+              deletingTaskId={deletingTaskId}
+              updatingTaskId={updatingTaskId}
+              sendingApprovalId={sendingApprovalId}
+            />
           )}
         </div>
       </main>
@@ -267,8 +189,7 @@ export default function Dashboard() {
         isOpen={!!taskToDelete}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        taskTitle={taskToDelete?.title || ''}
-        isDeleting={!!deletingTaskId}
+        task={taskToDelete}
       />
 
       <EditTaskModal
@@ -276,7 +197,6 @@ export default function Dashboard() {
         onClose={handleEditCancel}
         onConfirm={handleEditConfirm}
         task={taskToEdit}
-        isUpdating={!!updatingTaskId}
       />
 
       <SendApprovalModal
@@ -284,7 +204,6 @@ export default function Dashboard() {
         onClose={handleSendApprovalCancel}
         onConfirm={handleSendApprovalConfirm}
         task={taskToSendApproval}
-        isSending={!!sendingApprovalId}
       />
     </div>
   );

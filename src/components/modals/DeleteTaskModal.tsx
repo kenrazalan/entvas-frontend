@@ -1,61 +1,45 @@
 import { Button } from '@/components/UI/button';
-import Modal from '@/components/UI/Modal';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/UI/dialog";
+import { Task } from "@/services/task.service";
 
 interface DeleteTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  taskTitle: string;
-  isDeleting: boolean;
+  task: Task | null;
 }
 
 export default function DeleteTaskModal({
   isOpen,
   onClose,
   onConfirm,
-  taskTitle,
-  isDeleting
+  task,
 }: DeleteTaskModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Delete Task">
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 text-yellow-600">
-          <AlertTriangle size={20} />
-          <p className="font-medium">Are you sure you want to delete this task?</p>
-        </div>
-        
-        <p className="text-sm text-gray-600">
-          This will permanently delete the task "{taskTitle}". This action cannot be undone.
-        </p>
-
-        <div className="flex justify-end gap-2 w-full">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={onClose}
-            disabled={isDeleting}
-          >
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete Task</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete the task "{task?.title}"? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
-            type="button" 
-            variant="destructive" 
-            onClick={onConfirm}
-            disabled={isDeleting}
-            className="gap-2"
-          >
-            {isDeleting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Deleting...</span>
-              </>
-            ) : (
-              <span>Delete Task</span>
-            )}
+          <Button variant="destructive" onClick={onConfirm}>
+            Delete
           </Button>
-        </div>
-      </div>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 } 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/UI/button';
 import { Input } from '@/components/UI/input';
 import { Label } from '@/components/UI/label';
@@ -19,6 +19,29 @@ export default function TaskForm({ isOpen, onClose, onSuccess }: TaskFormProps) 
   const [assigneeEmail, setAssigneeEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Reference to the form element
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Reset form when modal is closed
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
+
+  // Custom reset function
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setAssigneeEmail('');
+    setError('');
+    
+    // Also reset the form using the native reset
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +57,7 @@ export default function TaskForm({ isOpen, onClose, onSuccess }: TaskFormProps) 
       
       await taskService.createTask(taskData);
       onSuccess();
+      resetForm(); // Reset form after successful submission
       onClose();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create task');
@@ -44,7 +68,7 @@ export default function TaskForm({ isOpen, onClose, onSuccess }: TaskFormProps) 
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Create New Task">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
         <div className="grid w-full items-center gap-4">
           <div className="flex flex-col space-y-1.5">
             <Label htmlFor="title">Title</Label>
@@ -88,7 +112,10 @@ export default function TaskForm({ isOpen, onClose, onSuccess }: TaskFormProps) 
           <Button 
             type="button" 
             variant="outline" 
-            onClick={onClose}
+            onClick={() => {
+              resetForm();
+              onClose();
+            }}
             disabled={loading}
           >
             Cancel

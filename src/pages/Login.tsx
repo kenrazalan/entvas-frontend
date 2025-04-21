@@ -33,7 +33,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] p-4">
       <div className="w-full max-w-[90%] sm:max-w-md">
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">Welcome Back</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">Welcome</h1>
           <p className="text-sm sm:text-base text-[hsl(var(--muted-foreground))]">Sign in to your account to continue</p>
         </div>
         

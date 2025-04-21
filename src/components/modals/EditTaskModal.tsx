@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/UI/input";
 import { Label } from "@/components/UI/label";
 import { Task } from "@/services/task.service";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface EditTaskModalProps {
   isOpen: boolean;
@@ -25,9 +25,18 @@ export default function EditTaskModal({
   onConfirm,
   task,
 }: EditTaskModalProps) {
-  const [title, setTitle] = useState(task?.title || '');
-  const [description, setDescription] = useState(task?.description || '');
-  const [assigneeEmail, setAssigneeEmail] = useState(task?.assigneeEmail || '');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [assigneeEmail, setAssigneeEmail] = useState('');
+
+  // Update form values when task changes
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title);
+      setDescription(task.description);
+      setAssigneeEmail(task.assigneeEmail);
+    }
+  }, [task]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

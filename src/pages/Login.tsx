@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/UI/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/UI/card";
+import { Input } from "@/components/UI/input";
+import { Label } from "@/components/UI/label";
 import { LogIn, Mail, Lock } from "lucide-react";
 import { authService } from '@/services/auth.service';
 
@@ -31,22 +31,22 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold gradient-text mb-2">Welcome Back</h1>
-          <p className="text-[hsl(var(--muted-foreground))]">Sign in to your account to continue</p>
+      <div className="w-full max-w-[90%] sm:max-w-md">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">Welcome</h1>
+          <p className="text-sm sm:text-base text-[hsl(var(--muted-foreground))]">Sign in to your account to continue</p>
         </div>
         
         <Card className="card-hover">
-          <CardHeader>
-            <CardTitle className="text-2xl">Login</CardTitle>
-            <CardDescription>Enter your credentials to access the dashboard.</CardDescription>
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-xl sm:text-2xl">Login</CardTitle>
+            <CardDescription className="text-sm">Enter your credentials to access the dashboard.</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent>
               <div className="grid w-full items-center gap-4">
                 <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="email" className="flex items-center gap-2">
+                  <Label htmlFor="email" className="flex items-center gap-2 text-sm">
                     <Mail size={16} />
                     <span>Email</span>
                   </Label>
@@ -57,11 +57,11 @@ export default function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-11"
+                    className="h-10 sm:h-11"
                   />
                 </div>
                 <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="password" className="flex items-center gap-2">
+                  <Label htmlFor="password" className="flex items-center gap-2 text-sm">
                     <Lock size={16} />
                     <span>Password</span>
                   </Label>
@@ -72,21 +72,16 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-11"
+                    className="h-10 sm:h-11"
                   />
-                </div>
-                <div className="flex justify-end">
-                  <Link to="/forgot-password" className="text-sm text-[hsl(var(--primary))] hover:underline">
-                    Forgot password?
-                  </Link>
                 </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               {error && (
-                <div className="text-red-500 text-sm text-center">{error}</div>
+                <div className="text-red-500 text-xs sm:text-sm text-center">{error}</div>
               )}
-              <Button type="submit" className="w-full h-11 gap-2" disabled={loading}>
+              <Button type="submit" className="w-full h-10 sm:h-11 gap-2" disabled={loading}>
                 {loading ? 'Signing in...' : (
                   <>
                     <LogIn size={18} />
@@ -94,7 +89,7 @@ export default function Login() {
                   </>
                 )}
               </Button>
-              <div className="text-center text-sm text-[hsl(var(--muted-foreground))]">
+              <div className="text-center text-xs sm:text-sm text-[hsl(var(--muted-foreground))]">
                 Don't have an account?{" "}
                 <Link to="/signup" className="text-[hsl(var(--primary))] hover:underline">
                   Sign up

@@ -1,25 +1,35 @@
-import { Link } from 'react-router-dom';
-import { ROUTES } from '../constants/routes';
+import { Button } from '@/components/UI/button';
+import { LogOut } from 'lucide-react';
+import { authService } from '@/services/auth.service';
 
-const Navbar = () => {
+interface NavbarProps {
+  onLogout: () => void;
+}
+
+export default function Navbar({ onLogout }: NavbarProps) {
+  const user = authService.getCurrentUser();
+
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md">
-      <div className="max-w-4xl mx-auto px-4">
-        <ul className="flex space-x-8 py-4">
-          <li>
-            <Link to={ROUTES.HOME} className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link to={ROUTES.ABOUT} className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-              About
-            </Link>
-          </li>
-        </ul>
+    <nav className="bg-white shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row justify-between py-4 sm:h-16">
+          <div className="flex items-center mb-4 sm:mb-0">
+            <h1 className="text-xl font-semibold">Task Management Dashboard</h1>
+          </div>
+          <div className="flex items-center">
+            <span className="mr-4 text-sm sm:text-base">Welcome, {user?.name || 'User'}</span>
+            <Button
+              onClick={onLogout}
+              variant="destructive"
+              size="sm"
+              className="gap-2"
+            >
+              <LogOut size={16} />
+            
+            </Button>
+          </div>
+        </div>
       </div>
     </nav>
   );
-};
-
-export default Navbar; 
+} 

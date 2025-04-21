@@ -25,7 +25,7 @@ export default function Navbar({ onLogout }: NavbarProps) {
               className="gap-2"
             >
               <LogOut size={16} />
-              <span className="hidden sm:inline">Logout</span>
+            
             </Button>
           </div>
         </div>

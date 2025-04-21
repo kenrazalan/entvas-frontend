@@ -3,6 +3,7 @@ import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Dashboard from '@/pages/Dashboard';
+import TaskResponse from '@/pages/TaskResponse';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/tasks/respond/:token" element={<TaskResponse />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Router>

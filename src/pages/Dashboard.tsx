@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { authService } from '@/services/auth.service';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, LogOut, Trash2 } from 'lucide-react';
+import { PlusCircle, LogOut, Trash2, Edit2 } from 'lucide-react';
 import TaskForm from '@/components/TaskForm';
 import DeleteTaskModal from '@/components/DeleteTaskModal';
+import EditTaskModal from '@/components/EditTaskModal';
 import { Task, taskService } from '@/services/task.service';
 
 export default function Dashboard() {
@@ -16,6 +17,8 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTasks();
@@ -43,7 +46,6 @@ export default function Dashboard() {
   };
 
   const handleDeleteClick = (task: Task) => {
-    console.log(task, 'task')
     setTaskToDelete(task);
   };
 
@@ -65,6 +67,34 @@ export default function Dashboard() {
   const handleDeleteCancel = () => {
     setTaskToDelete(null);
     setDeletingTaskId(null);
+  };
+
+  const handleEditClick = (task: Task) => {
+    setTaskToEdit(task);
+  };
+
+  const handleEditConfirm = async (taskData: { title: string; description: string; assigneeEmail: string }) => {
+    if (!taskToEdit) return;
+
+    try {
+      setUpdatingTaskId(taskToEdit._id);
+      const updatedTask = await taskService.updateTask(taskToEdit._id, taskData);
+      
+      // Update the task in the local state
+      setTasks(tasks.map(task => 
+        task._id === taskToEdit._id ? updatedTask : task
+      ));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to update task');
+    } finally {
+      setUpdatingTaskId(null);
+      setTaskToEdit(null);
+    }
+  };
+
+  const handleEditCancel = () => {
+    setTaskToEdit(null);
+    setUpdatingTaskId(null);
   };
 
   return (
@@ -148,16 +178,28 @@ export default function Dashboard() {
                         }`}>
                           {task.status}
                         </span>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteClick(task)}
-                          disabled={deletingTaskId === task._id}
-                          className="gap-2"
-                        >
-                          <Trash2 size={16} />
-                          <span>Delete</span>
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditClick(task)}
+                            disabled={updatingTaskId === task._id}
+                            className="gap-2"
+                          >
+                            <Edit2 size={16} />
+                            <span>Edit</span>
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteClick(task)}
+                            disabled={deletingTaskId === task._id}
+                            className="gap-2"
+                          >
+                            <Trash2 size={16} />
+                            <span>Delete</span>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -174,6 +216,14 @@ export default function Dashboard() {
         onConfirm={handleDeleteConfirm}
         taskTitle={taskToDelete?.title || ''}
         isDeleting={!!deletingTaskId}
+      />
+
+      <EditTaskModal
+        isOpen={!!taskToEdit}
+        onClose={handleEditCancel}
+        onConfirm={handleEditConfirm}
+        task={taskToEdit}
+        isUpdating={!!updatingTaskId}
       />
     </div>
   );

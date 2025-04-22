@@ -8,6 +8,10 @@ export interface Task {
   title: string;
   description: string;
   assigneeEmail: string;
+  creator: {
+    email: string;
+    name: string;
+  };
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   createdAt: string;
   updatedAt: string;

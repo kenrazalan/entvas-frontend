@@ -125,6 +125,11 @@ export default function TaskResponse() {
               <p className="mt-1 text-gray-900">{task?.description}</p>
             </div>
             
+            <div>
+              <h3 className="text-sm font-medium text-gray-500">Created By</h3>
+              <p className="mt-1 text-gray-900">{task?.creator?.email}</p>
+            </div>
+            
             {/* <div>
               <h3 className="text-sm font-medium text-gray-500">Assigned By</h3>
               <p className="mt-1 text-gray-900">{task?.assigneeEmail}</p>
